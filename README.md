@@ -8,6 +8,7 @@
 ## 直接安装
 
 - 下载仓库根目录的 [百变印章.apk](百变印章.apk)（约 27 MB），在 Android 手机上点击安装即可
+- 也可在 [Releases v1.0](https://github.com/donghuaigu123/bai-bian-yin-zhang/releases/tag/v1.0) 下载 `BaiBianYinZhang-v1.0.apk`
 - 要求 **Android 5.0（API 21）及以上**，无需联网、无需注册、无广告
 - 首次保存到相册时，Android 9 及以下会请求一次存储权限；Android 10 及以上无需任何权限
 
