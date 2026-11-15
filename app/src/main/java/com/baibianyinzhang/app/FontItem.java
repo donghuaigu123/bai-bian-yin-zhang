@@ -8,7 +8,7 @@ public class FontItem {
     public final String name;
     /** 书体分类 */
     public final String style;
-    /** 字形覆盖有限（篆书、教育部隶书），缺字时自动回退到楷书 */
+    /** 字形覆盖有限（篆书、青柳古隶），缺字时自动回退到楷书 */
     public final boolean needFallback;
 
     public FontItem(String asset, String name, String style, boolean needFallback) {

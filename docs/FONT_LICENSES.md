@@ -15,7 +15,7 @@
 | `songti.ttf` | 站酷小薇 | 宋韵 | ZCOOL XiaoWei · Google Fonts（`@expo-google-fonts/zcool-xiaowei@0.4.1`） | SIL OFL 1.1 | 子集化 + 重命名 |
 | `heiti.ttf` | 庆科黄油 | 现代 | ZCOOL QingKe HuangYou · Google Fonts（`@expo-google-fonts/zcool-qingke-huangyou@0.4.1`） | SIL OFL 1.1 | 子集化 + 重命名 |
 | `quwei.ttf` | 站酷快乐 | 趣味 | ZCOOL KuaiLe · Google Fonts（`@expo-google-fonts/zcool-kuaile@0.4.2`） | SIL OFL 1.1 | 子集化 + 重命名 |
-| `lishu.ttf` | 教育部隶书 | 隶书 | 教育部隸書 / TW-MOE-Li 3.0 · 台湾地区教育主管部门（npm `@fontpkg/tw-moe-li@3.0.0`） | CC 姓名标示–禁止改作 3.0 台湾版（CC BY-ND 3.0 TW） | **逐字节原样复制，未做任何修改** |
+| `lishu.ttf` | 青柳古隶 | 隶书 | 青柳隷書しも V2.01 · 青柳衡山挥毫 / SIMO 制作，[opentype.jp 官方发布页](https://opentype.jp/aoyagireisho.htm) | 作者自由授权（《フォントの使用方法》） | 保留完整字形 + 重命名；随附条款与解说原文 |
 | `zhuanshu.ttf` | 说文小篆 | 篆书 | Shuowen Seal 印章专用子集 · [`LiaBrio/seal-fonts`](https://github.com/LiaBrio/seal-fonts) | SIL OFL 1.1 | WOFF → TTF 容器转换 + 重命名 |
 
 ## 1. SIL Open Font License 1.1 字体（8 款）
@@ -39,39 +39,75 @@ Reserved Font Name 条款把字体内部名称统一改为 `BBYZ *`，保留 nam
 开元小篆（OFL 1.1）与「全字庫說文解字」（OGDL-Taiwan-1.0）。本项目只做了
 WOFF → TTF 的容器格式转换，未改动字形。
 
-## 2. 教育部隶书（CC BY-ND 3.0 TW）
+## 2. 青柳隷書しも（作者自由授权）
 
-字体 name 表中的版权字段明确声明该字型档采用「创用 CC 姓名标示–禁止改作 3.0
-台湾版」授权，并写明「允许商业与非商业的再散布，条件是**原样、完整传递**并
-标示原始发布单位」。
+`lishu.ttf`（界面名「青柳古隶」）来自日本书法家**青柳衡山**先生挥毫、
+**SIMO（しも）**先生制作的自由字体「青柳隷書しも」V2.01（JIS 第二水准版），
+由 [opentype.jp](https://opentype.jp/aoyagireisho.htm) 官方发布。这是一款
+**书写体古隶**：笔画带波磔、横向舒展、有金石手书味，与规整的碑刻汉隶风格
+不同，用于闲章、落款尤具古意。
 
-因此本项目对 `lishu.ttf` 采取最保守的处理方式：
+官方压缩包内《フォントの使用方法.txt》的授权条款原文（日文）摘录：
 
-- **不子集化、不重命名、不改动任何一个字节**，与 npm 包内原始 TTF 完全一致
-- 随 APK 与仓库原样分发
-- 在此具名标示：字体为台湾地区教育主管部门「教育部隸書（TW-MOE-Li）」3.0 版，
-  依 CC BY-ND 3.0 TW 使用；本项目未创作该字体的衍生/改作版本
+> 青柳隷書しもフォントは無料フォントです。使用にあたっての条件は何も
+> ありません。商用使用もＯＫです。（できましたら連絡はください）
+>
+> 青柳隷書しもフォントは無料でどこにでも配布することができます。た
+> だし、再配布にあたって有料とすることはできません。
+>
+> 青柳隷書しもフォントを配布する際には、必ずフォントの使用方法と、フ
+> ォントの解説を一緒に配布するようにしてください。
+>
+> 使用や再配布にあたっての連絡は不要です…　　　SIMO
 
-> 授权参考：Creative Commons Attribution-NoDerivs 3.0 Taiwan
-> <https://creativecommons.org/licenses/by-nd/3.0/tw/>
+中文要点：
 
-## 3. 关于被排除的字体
+- **使用没有任何条件，允许商业使用**
+- **可以免费在任何地方自由再分发**，唯一限制是再分发不得收费
+- **分发字体时必须同时附上《使用方法》与《解说》两份原文**
+- 使用与再分发均**无需事先联系作者**；条款未对改作设限
 
-调研过程中曾考虑但**最终未采用**以下字体，原因是授权不适合开源再分发：
+本项目的合规处理：
 
-| 字体 | 版权声明 | 未采用原因 |
+- 授权原文三份文件按**原始字节**保存，未转码、未改动：
+  [`licenses/AoyagiReisho_terms_ja.txt`](licenses/AoyagiReisho_terms_ja.txt)、
+  [`licenses/AoyagiReisho_explanation.pdf`](licenses/AoyagiReisho_explanation.pdf)、
+  [`licenses/AoyagiReisho_explanation.doc`](licenses/AoyagiReisho_explanation.doc)
+- 同样三份文件也放进 `app/src/main/assets/licenses/`，**随 APK 一起分发**，
+  确保只拿到 APK 的用户也能看到条款与解说
+- 本项目与 APK 均**免费提供**，不存在有偿再分发
+- 字体**保留全部 14963 个字形**，仅把内部字体名改为 `BBYZ Lishu` 以与官方
+  原版区分；字形轮廓与 glyf 表数据未作任何改动。该字体是老式 TrueType，
+  `fontTools` 子集化重新编译 glyf 表会触发长度断言，因此不做子集化 ——
+  这也顺带保留了大量繁体、异体字，更适合印章用字
+- 在此具名标示原作者：书法 青柳衡山、字体制作 SIMO
+
+> 注：这份授权不是 SIL OFL，而是版权人发布的自由使用声明。条款以随附的
+> 日文原文为准，上面的中文为便于理解的转述，不构成法律意见。
+
+## 3. 关于被替换 / 排除的字体
+
+为「换掉禁止改作的 CC BY-ND 隶书」，调研过以下来源。它们均因授权或字形
+不适合随开源仓库与 APK 再分发而未采用：
+
+| 字体 | 授权 / 声明 | 未采用原因 |
 | --- | --- | --- |
-| 崇羲篆體（Chong Xi Small Seal） | `Typeface © Academia Sinica. 2022. All Rights Reserved` | 保留所有权利，非开源 |
-| 阿里妈妈刀隶体 | `Copyright (c) 2023 Alibaba (China) Co., Ltd. All rights reserved.` | 保留所有权利 |
-| 临海隶书 | 无明确授权声明 | 授权不明 |
+| 教育部隸書 TW-MOE-Li 3.0（**上一版所用**） | CC BY-ND 3.0 TW | 禁止改作，只能逐字节原样分发、无法子集化；且仅覆盖 45.5% 的 GB2312 简体字，已由青柳古隶替换 |
+| 阿里妈妈刀隶体 | 阿里妈妈免费字体法律声明第 4 条 | 明确禁止「修改、重新分发、二次创作」以及「与其他软件产品组合等方式许可给第三方使用」 |
+| 临海隶书 | 作者声明免费商用 | 明确「不允许将字体文件嵌入到软件、APP、网站或电子设备中作为内置字体使用」 |
+| 王漢宗中隸書繁 | GNU GPL（王汉宗自由字型） | 2005 年文鼎科技主张侵权，双方和解后作者同意停止散布该批字型 |
+| Yuji Syuku | SIL OFL 1.1 | 授权完全合规，但字形实为行楷而非隶书，不适合作为「隶书」交付 |
+| 崇羲篆體 | © Academia Sinica, All Rights Reserved | 保留所有权利，非开源 |
 
 ## 4. 字形覆盖与缺字处理
 
 | 字体 | 可用字形数 | 说明 |
 | --- | --- | --- |
 | Google Fonts 7 款 | 约 6900–7200 | 覆盖 GB2312 全部简体字 + 常用繁体 |
-| 教育部隶书 | 约 5590 | 以台湾标准字集为主，部分简体字无字形 |
+| 青柳古隶 | 14963（完整保留） | 以 JIS 第二水准汉字为主，命中约 65% 的 GB2312 简体字（优于上一版教育部隶书的 45.5%）；另含大量繁体与异体字 |
 | 说文小篆 | 4752 | 《通用规范汉字表》一、二级字表中该字体已有的篆形 |
 
 篆书与隶书遇到无字形的字时，App 会用 `Paint.hasGlyph()` 检测并**自动回退到
-楷书**渲染该字，避免出现方框，同时在选字体时提示用户。
+楷书**渲染该字，避免出现方框，同时在选字体时提示用户。印章常用字（吉祥语、
+传统姓名用字）多为传承字形，青柳古隶覆盖较好；输入纯简体姓名时个别字回退
+楷书属预期行为。

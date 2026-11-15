@@ -57,14 +57,17 @@
 | 行楷 | 龙藏行楷 | OFL 1.1 |
 | 行书 | 志莽行书 | OFL 1.1 |
 | 草书 | 刘建毛草 | OFL 1.1 |
-| 隶书 | 教育部隶书 | CC BY-ND 3.0 TW（原样分发） |
+| 隶书 | 青柳古隶（青柳隷書しも） | 作者自由授权：可商用、可免费再分发 |
 | 篆书 | 说文小篆 | OFL 1.1 |
 | 宋韵 | 站酷小薇 | OFL 1.1 |
 | 现代 | 庆科黄油 | OFL 1.1 |
 | 趣味 | 站酷快乐 | OFL 1.1 |
 
-字体的完整来源、授权全文与本项目做的处理（哪些做了子集化、哪些逐字节原样保留）
-见 [docs/FONT_LICENSES.md](docs/FONT_LICENSES.md)。
+隶书为书写体古隶，笔画带波磔、有金石手书味，与规整的碑刻汉隶风格不同，
+适合闲章与落款；因是日文字集，部分简体字会自动回退到楷书。
+
+字体的完整来源、授权全文与本项目做的处理（子集化 / 格式转换 / 随附授权
+原文）见 [docs/FONT_LICENSES.md](docs/FONT_LICENSES.md)。
 **字体不适用 MIT 许可**，请务必按各自的授权使用。
 
 ## 从源码构建
@@ -74,12 +77,13 @@
 - JDK 17
 - Android SDK：`platforms;android-34` + `build-tools;34.0.0`（设置 `ANDROID_HOME`）
 - Python 3 + `fontTools` + `Pillow`（仅重新生成字体/图片时需要）
+- `curl`（仅重新下载青柳隷書字体时需要）
 
 ```bash
 git clone https://github.com/donghuaigu123/bai-bian-yin-zhang.git
 cd bai-bian-yin-zhang
 
-# 可选：重新下载并子集化字体（仓库已附带，通常不需要）
+# 可选：重新下载并合规化字体（仓库已附带，通常不需要）
 python3 scripts/prepare_fonts.py
 
 # 可选：重新生成应用图标与 docs/preview.png
@@ -103,15 +107,17 @@ app/src/main/
 │   ├── SealTemplate.java      15 种模板定义
 │   └── FontItem.java          字体条目
 ├── res/                       布局、颜色、样式、图标
-└── assets/fonts/              9 款内置字体
+└── assets/
+    ├── fonts/                 9 款内置字体
+    └── licenses/              青柳隷書授权原文（随 APK 分发）
 scripts/
-├── prepare_fonts.py           字体下载与合规化（子集化 / 原样复制 / 格式转换）
+├── prepare_fonts.py           字体下载与合规化（子集化 / 改名 / 格式转换 / 随附授权原文）
 ├── make_assets.py             生成图标与展示图
 └── build-apk.sh               纯命令行构建 + 签名
 docs/
 ├── preview.png                效果展示图
 ├── FONT_LICENSES.md           字体授权说明
-└── licenses/                  OFL 全文与来源声明
+└── licenses/                  OFL 全文、青柳隷書授权原文与来源声明
 ```
 
 ## 授权

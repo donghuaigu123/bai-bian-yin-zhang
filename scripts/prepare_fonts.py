@@ -3,25 +3,33 @@
 """
 百变印章 · 字体准备脚本
 
-输出 app/src/main/assets/fonts/ 下的 9 款内置字体。字体分三类处理：
+输出 app/src/main/assets/fonts/ 下的 9 款内置字体：
 
-1. Google Fonts 系（OFL 1.1）：允许改作，按 GB2312 + 常用繁体字集做子集化，
-   并按 OFL 的 Reserved Font Name 条款重命名。
-2. 教育部隶书（CC BY-ND 3.0 TW）：授权明确要求「原样、完整传递并署名」，
-   因此**不做任何修改**（不子集化、不改名），逐字节复制原始 TTF。
-3. 说文小篆（OFL 1.1，LiaBrio/seal-fonts 的印章专用子集）：仅做
+1. Google Fonts 系 7 款（SIL OFL 1.1）：允许改作，按 GB2312 + 常用繁体字集
+   做子集化，并按 OFL 的 Reserved Font Name 条款重命名。
+2. 青柳隷書しも（作者自由授权）：官方《フォントの使用方法》明确「使用无任何
+   条件、可商用、可免费在任何地方再分发」，因此可随 APK / 仓库自由分发。该授权
+   要求随字体一并附上《使用方法》与《解説》原文，本脚本会把两份文件同时写入
+   docs/licenses/ 与 app/src/main/assets/licenses/（后者随 APK 一并分发）。
+   该字体是 2009 年的老式 TrueType，glyf 表尾部带额外数据，fontTools 子集化
+   重新编译 glyf 时会触发 "too much glyf table data" 断言，因此**保留全部
+   14963 个字形**，只改内部字体名，字形数据一个字节都不动。
+3. 说文小篆（SIL OFL 1.1，LiaBrio/seal-fonts 的印章专用子集）：仅做
    WOFF -> TTF 的容器格式转换并重命名，不改动字形轮廓。
 
-各字体完整来源与授权见 docs/FONT_LICENSES.md。
+各字体完整来源、授权全文与处理方式见 docs/FONT_LICENSES.md。
 """
 
 import io
 import json
 import os
+import subprocess
 import sys
 import tarfile
 import time
 import urllib.request
+import zipfile
+from concurrent.futures import ThreadPoolExecutor
 
 from fontTools import subset
 from fontTools.ttLib import TTFont
@@ -32,6 +40,23 @@ CACHE = "/root/.codebuddy/artifact/2f8a7d30-9c21-4f0b-1d72-b9e3a71de000/fonts_ca
 SEAL_WOFF = os.path.join(CACHE, "ShuowenSeal-Subset.woff")
 os.makedirs(OUT, exist_ok=True)
 os.makedirs(CACHE, exist_ok=True)
+
+# 青柳隷書しも：官方发布页 https://opentype.jp/aoyagireisho.htm
+AOYAGI_URL = "https://opentype.jp/bin/aoyagireisyosimo_ttf_2_01.zip"
+AOYAGI_TTF = os.path.join(CACHE, "aoyagi_reisho.ttf")
+AOYAGI_ZIP = os.path.join(CACHE, "aoyagireisho.zip")
+LICENSE_DIRS = [
+    os.path.join(ROOT, "docs", "licenses"),
+    os.path.join(ROOT, "app", "src", "main", "assets", "licenses"),
+]
+# 授权要求随字体附带的两份原文（保持原始字节，不转码、不改名内容）
+AOYAGI_DOCS = {
+    ".txt": "AoyagiReisho_terms_ja.txt",     # フォントの使用方法（授权条款）
+    ".pdf": "AoyagiReisho_explanation.pdf",  # フォントの解説
+    ".doc": "AoyagiReisho_explanation.doc",  # フォントの解説（Word 版）
+}
+for _d in LICENSE_DIRS:
+    os.makedirs(_d, exist_ok=True)
 
 # (输出文件名, npm 包, 包内匹配关键字, 显示名, 风格, 内部字体名)
 OFL_FONTS = [
@@ -127,7 +152,7 @@ def extract_font(pkg, match):
 
 
 def rename_font(font, internal_name):
-    """按 OFL 的保留字体名条款重命名，同时保留版权与许可声明（nameID 0/13/14）"""
+    """重命名内部字体名，同时保留版权与许可声明（nameID 0 / 13 / 14）"""
     name_table = font["name"]
     name_table.names = [r for r in name_table.names if r.nameID not in (1, 4, 6, 16, 17)]
     postscript = internal_name.replace(" ", "")
@@ -164,6 +189,91 @@ def convert_woff_to_ttf(woff_path, out_path, internal_name):
     return len(font.getBestCmap())
 
 
+def rename_only_font(data, out_path, internal_name):
+    """保留全部字形，仅重写 name 表；用于不宜子集化的老式 TrueType 字体。
+
+    recalcBBoxes=False 避免 fontTools 为了重算边界而反编译 glyf 表；
+    未加载的表会由 SFNTReader 原样复制，字形与轮廓完全不变。
+    """
+    font = TTFont(io.BytesIO(data), recalcBBoxes=False)
+    rename_font(font, internal_name)
+    font.save(out_path)
+    return len(font.getBestCmap())
+
+
+def aoyagi_docs_ready():
+    return all(
+        os.path.exists(os.path.join(d, name)) and os.path.getsize(os.path.join(d, name)) > 100
+        for d in LICENSE_DIRS for name in AOYAGI_DOCS.values()
+    )
+
+
+def curl_bytes(args, timeout=200):
+    return subprocess.run(
+        ["curl", "-sL", "-A", "Mozilla/5.0"] + args,
+        capture_output=True, timeout=timeout,
+    )
+
+
+def download_aoyagi():
+    """从官方发布页下载青柳隷書しも V2.01 的 TTF 与授权原文。
+
+    该站点单连接会被限速截断，因此用 HTTP Range 分 8 段并行下载后拼接。
+    """
+    if (os.path.exists(AOYAGI_TTF) and os.path.getsize(AOYAGI_TTF) > 1_000_000
+            and aoyagi_docs_ready()):
+        print("青柳隷書：已缓存 TTF 与授权原文，跳过下载", flush=True)
+        return AOYAGI_TTF
+
+    head = curl_bytes(["-I", "--max-time", "30", AOYAGI_URL], 45).stdout.decode("latin1")
+    lengths = [l for l in head.splitlines() if l.lower().startswith("content-length:")]
+    if not lengths:
+        raise RuntimeError("无法取得青柳隷書压缩包大小")
+    total = int(lengths[-1].split(":", 1)[1].strip())
+    print("青柳隷書：分段下载 %.2f MB ..." % (total / 1048576.0), flush=True)
+
+    parts = 8
+    step = (total + parts - 1) // parts
+
+    def fetch_part(i):
+        start = i * step
+        end = min(total - 1, (i + 1) * step - 1)
+        path = os.path.join(CACHE, "aoyagi_part_%d" % i)
+        for _ in range(4):
+            curl_bytes(["--retry", "2", "--max-time", "180",
+                        "-r", "%d-%d" % (start, end), "-o", path, AOYAGI_URL])
+            if os.path.exists(path) and os.path.getsize(path) == end - start + 1:
+                return i, True
+            time.sleep(1)
+        return i, False
+
+    with ThreadPoolExecutor(max_workers=parts) as pool:
+        result = list(pool.map(fetch_part, range(parts)))
+    if not all(ok for _, ok in result):
+        raise RuntimeError("青柳隷書分段下载失败：%s" % result)
+    with open(AOYAGI_ZIP, "wb") as writer:
+        for i in range(parts):
+            with open(os.path.join(CACHE, "aoyagi_part_%d" % i), "rb") as reader:
+                writer.write(reader.read())
+
+    with zipfile.ZipFile(AOYAGI_ZIP) as zf:
+        for info in zf.infolist():
+            data = zf.read(info)
+            low = info.filename.lower()
+            if low.endswith(".ttf"):
+                with open(AOYAGI_TTF, "wb") as fh:
+                    fh.write(data)
+            else:
+                for ext, name in AOYAGI_DOCS.items():
+                    if low.endswith(ext):
+                        for d in LICENSE_DIRS:
+                            with open(os.path.join(d, name), "wb") as fh:
+                                fh.write(data)   # 原始字节，不转码
+                        break
+    print("青柳隷書：TTF 与授权原文已就位", flush=True)
+    return AOYAGI_TTF
+
+
 def record(manifest, file_name, display, style, source, detail, size_kb, glyphs):
     manifest.append({
         "file": file_name, "name": display, "style": style,
@@ -184,7 +294,7 @@ def main():
     print("目标字集: %d 个码位" % len(codepoints), flush=True)
     manifest = []
 
-    # 1) OFL 字体：子集化 + 重命名
+    # 1) Google Fonts 系 OFL 字体：子集化 + 重命名
     for out_name, pkg, match, display, style, internal in OFL_FONTS:
         try:
             data, member, version = extract_font(pkg, match)
@@ -197,16 +307,16 @@ def main():
             print("FAIL %-16s %s" % (out_name, exc), flush=True)
             manifest.append({"file": out_name, "error": str(exc)})
 
-    # 2) 教育部隶书：CC BY-ND，逐字节原样复制，禁止任何改作
+    # 2) 青柳隷書しも：作者自由授权，保留完整字形 + 重命名，并随附授权原文
     try:
-        data, member, version = extract_font("@fontpkg/tw-moe-li", "")
+        ttf_path = download_aoyagi()
+        with open(ttf_path, "rb") as fh:
+            data = fh.read()
         out_path = os.path.join(OUT, "lishu.ttf")
-        with open(out_path, "wb") as fh:
-            fh.write(data)
-        count = len(TTFont(io.BytesIO(data)).getBestCmap())
-        record(manifest, "lishu.ttf", "教育部隶书", "隶书",
-               "@fontpkg/tw-moe-li@" + version,
-               "CC BY-ND 3.0 TW / 原样复制，未做任何修改",
+        count = rename_only_font(data, out_path, "BBYZ Lishu")
+        record(manifest, "lishu.ttf", "青柳古隶", "隶书",
+               "opentype.jp / 青柳隷書しも V2.01",
+               "作者自由授权 / 保留完整字形 + 重命名 / 已随附条款与解说原文",
                os.path.getsize(out_path) // 1024, count)
     except Exception as exc:          # noqa: BLE001
         print("FAIL lishu.ttf %s" % exc, flush=True)

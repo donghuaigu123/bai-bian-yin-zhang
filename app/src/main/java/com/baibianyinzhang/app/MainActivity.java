@@ -107,7 +107,7 @@ public class MainActivity extends Activity {
         fonts.add(new FontItem("fonts/xingkai.ttf", "龙藏行楷", "行楷", false));
         fonts.add(new FontItem("fonts/xingshu.ttf", "志莽行书", "行书", false));
         fonts.add(new FontItem("fonts/caoshu.ttf", "刘建毛草", "草书", false));
-        fonts.add(new FontItem("fonts/lishu.ttf", "教育部隶书", "隶书", true));
+        fonts.add(new FontItem("fonts/lishu.ttf", "青柳古隶", "隶书", true));
         fonts.add(new FontItem("fonts/zhuanshu.ttf", "说文小篆", "篆书", true));
         fonts.add(new FontItem("fonts/songti.ttf", "站酷小薇", "宋韵", false));
         fonts.add(new FontItem("fonts/heiti.ttf", "庆科黄油", "现代", false));

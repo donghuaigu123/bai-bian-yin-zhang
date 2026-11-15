@@ -93,7 +93,7 @@ def make_preview():
 
     samples = [
         ("circle", "kaishu.ttf", "平安喜乐", "圆形 / 楷书"),
-        ("square", "lishu.ttf", "平安", "方形 / 隶书"),
+        ("square", "lishu.ttf", "平安", "方形 / 古隶"),
         ("double", "zhuanshu.ttf", "福", "双线 / 篆书"),
         ("none", "caoshu.ttf", "墨韵", "无边框 / 草书"),
     ]
