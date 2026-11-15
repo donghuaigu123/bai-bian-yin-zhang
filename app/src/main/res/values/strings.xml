@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">百变印章</string>
+    <string name="subtitle">选形状 · 挑字体 · 打字 · 一键保存，三步出印</string>
+    <string name="step1">① 输入印章文字</string>
+    <string name="step2">② 选一个喜欢的形状</string>
+    <string name="step3">③ 选一种字体</string>
+    <string name="preview_title">效果预览 · 白底红字</string>
+    <string name="preview_desc">生成的印章预览图</string>
+    <string name="hint_input">例如：张三 / 平安喜乐</string>
+    <string name="default_text">平安喜乐</string>
+    <string name="save">保存到相册 / 下载图片</string>
+    <string name="share">分享给朋友</string>
+    <string name="tip">生成的图片为 1600 × 1600 高清 PNG，纯白底、朱红字，保存在相册的「百变印章」文件夹里，可直接用于落款、头像或打印。</string>
+    <string name="quick_label">懒人一键填词：</string>
+</resources>

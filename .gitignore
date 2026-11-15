@@ -1,0 +1,10 @@
+# 构建中间产物（含签名密钥，不要提交）
+build/
+*.idsig
+*.pyc
+__pycache__/
+.idea/
+*.iml
+.DS_Store
+
+# 注意：百变印章.apk 与 assets/fonts/ 均为交付物，需要提交，请勿忽略

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="seal_red">#FFC8282E</color>
+    <color name="seal_red_dark">#FFA81F25</color>
+    <color name="seal_red_light">#33C8282E</color>
+    <color name="app_bg">#FFF5F2EC</color>
+    <color name="card_bg">#FFFFFFFF</color>
+    <color name="text_main">#FF2B2B2B</color>
+    <color name="text_sub">#FF8A8378</color>
+    <color name="divider">#FFE5DED1</color>
+    <color name="chip_bg">#FFF0EBE2</color>
+    <color name="chip_stroke">#FFDCD3C4</color>
+</resources>
